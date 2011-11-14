@@ -17,40 +17,63 @@ vows.describe("testUser.test").addBatch({
       assert.isNull(fbgraph.getAccessToken());
     }
   }
-
 }).addBatch({
-  "With test users": {
+
+  'test users': {
+  
     topic: function () {
-      fbTest.createUser("Magic Man", this.callback);
+     var users =  fbTest
+                .User("Magic Man")
+                .getUsers();
+
+     return users;
     },
 
-    "we should be able to create *user 1*": function(res) {
-      assert.isNotNull(res);
+    'chaining': function () {
+      console.log(arguments);
+
     },
 
-    "after creating *user 1*": {
-      topic: function (res) {
-        fbTest.createUser("El diablo", this.callback);
-      },
+    'user should be created': 'pending'
 
-      "we should be able to create *user 2*": function(res) {
-        assert.isNotNull(res);
-      },
-
-      "and *user2* ": {
-        topic: function (res) {
-          fbTest.friendRequest({
-              from:  "Magic Man"
-            , to:    "El Diablo"
-          }, this.callback);
-        },
-
-        "*user2* should accept friend request": function (res) {
-          assert.equal(res.data, "true");
-        }
-      }
-    }
+  
   }
+
+
+
+// }).addBatch({
+//   "With test users": {
+//     topic: function () {
+//       fbTest.createUser("Magic Man", this.callback);
+//     },
+// 
+//     "we should be able to create *user 1*": function(res) {
+//       assert.isNotNull(res);
+//     },
+// 
+//     "after creating *user 1*": {
+//       topic: function (res) {
+//         fbTest.createUser("El diablo", this.callback);
+//       },
+// 
+//       "we should be able to create *user 2*": function(res) {
+//         assert.isNotNull(res);
+//       },
+// 
+//       "and *user2* ": {
+//         topic: function (res) {
+//           fbTest.friendRequest({
+//               from:  "Magic Man"
+//             , to:    "El Diablo"
+//           }, this.callback);
+//         },
+// 
+//         "*user2* should accept friend request": function (res) {
+//           assert.equal(res.data, "true");
+//         }
+//       }
+//     }
+//   }
 }).addBatch({
 
   "When tests are over": {
