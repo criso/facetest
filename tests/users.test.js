@@ -3,7 +3,7 @@ var fbgraph  = require('fbgraph')
   , vows     = require('vows')
   , assert   = require('assert');
 
-var fbTest = require('../index');
+var faceTest = require('../index');
 
 var appAccessToken = fbConfig.appId + "|" + fbConfig.appSecret;
 
@@ -22,9 +22,47 @@ vows.describe("testUser.test").addBatch({
   'test users': {
   
     topic: function () {
-     var users =  fbTest
-                .User("Magic Man")
-                .getUsers();
+      faceTest
+        .options()
+        // .createUsers(["Magic Man", "El diablo", "roocky"])
+        .friends('all') 
+        .createUser("Magic Man")
+        .friendsWith(["El diablo", "Ricky Bobby"])  // 
+        .end(function(self) {
+           
+        });
+
+// --------------------------------------
+// api
+
+facetest
+  // overrides options
+  .options({ installed: true })
+  // sets that the user 'Magic Man'
+  // is friends with 'an array of users'
+  // This should automatically create those users
+  // and send friend requests
+  .friends({
+    'Magic Man': ['El Diablo', 'Ricky Bobby']  
+  });
+
+
+facetest
+  .user('Magic Man')
+  .friendsWith(['El Diablo', 'Ricky Booby']);
+
+
+facetest.on('end', function () { })
+
+
+
+
+
+
+
+
+
+      // .getUsers();
 
      return users;
     },
