@@ -1,12 +1,22 @@
 var fbgraph  = require('fbgraph')
   , fbConfig = require('./config').facebook
   , vows     = require('vows')
-  , assert   = require('assert');
+  , assert   = require('assert') 
+  , FaceTest = require('../index');
 
-var faceTest = require('../index');
+var faceTest       = new FaceTest()
+  , appAccessToken = fbConfig.appId + "|" + fbConfig.appSecret;
 
-var appAccessToken = fbConfig.appId + "|" + fbConfig.appSecret;
 
+// test Data
+var testData = {
+    singleUser: 'Magic Man'
+  , multipleUsers: ['Ricky Bobby', 'El Diablo', 'Magic Man']
+};
+
+
+
+// do we need to reset fbgraph?
 vows.describe("testUser.test").addBatch({
   "Before starting a test suite": {
     topic:  function () {
@@ -19,51 +29,94 @@ vows.describe("testUser.test").addBatch({
   }
 }).addBatch({
 
-  'test users': {
+  'When creating a single user': {
   
     topic: function () {
-      faceTest
-        .options()
-        // .createUsers(["Magic Man", "El diablo", "roocky"])
-        .friends('all') 
-        .createUser("Magic Man")
-        .friendsWith(["El diablo", "Ricky Bobby"])  // 
-        .end(function(self) {
-           
-        });
+      return faceTest.createUser(testData.singleUser);
     },
     
-    "": "pending"
+    "on success it should return the user": function(err, user) {
+      var name = testData.singleUser;
 
-  }
-
-}).addBatch({
-
-  "When tests are over": {
-    topic: function () {
-      return fbgraph.setAccessToken(appAccessToken);
+      assert.isNull(err);
+      assert.include(user, name);
+      assert.include(user[name], 'access_token');
+      assert.include(user[name], 'login_url');
+      assert.include(user[name], 'email');
+      assert.include(user[name], 'password');
     },
 
-    "after reseting the access token - ": {
-      "test *user 1*": {
-        topic: function (fbgraph) {
-          fbgraph.del(fbTest.getUser('Magic Man').id, this.callback);
-        },
-
-        "should be removed": function(res){
-          assert.equal(res.data, "true");
-        }
+    "and retrieving the userList ":  {
+    
+      topic: function () {
+        return faceTest.getFacebookUsers();
       },
 
-      "test *user 2*": {
-        topic: function (fbgraph) {
-          fbgraph.del(fbTest.getUser('El Diablo').id, this.callback);
-        },
-
-        "should be removed": function(res){
-          assert.equal(res.data, "true");
-        }
+      "it should contain the created user": function(userList) {
+        var name = testData.singleUser;
+        assert.include(userList, name);
+        assert.include(userList[name], 'access_token');
+        assert.include(userList[name], 'login_url');
+        assert.include(userList[name], 'email');
+        assert.include(userList[name], 'password');
       }
+    }
+  }
+}).addBatch({
+  'After single user creation': {
+    topic:  function () {
+      faceTest.removeAllFacebookUsers(this.callback); 
+    },
+
+    'test users should be deleted': function (err, res) {
+      assert.isNull(err);
+      assert.equal(res.data, "true");
+      assert.isEmpty(faceTest.getFacebookUsers());
+    }
+  }
+}).addBatch({
+  'When creating multiple users': {
+    topic: function () {
+      return faceTest.createUsers(testData.multipleUsers);
+    },
+    
+    "on success it should return the list of users": function(userList) {
+      testData.multipleUsers.forEach(function (name) {
+        assert.include(userList, name);
+        assert.include(userList[name], 'access_token');
+        assert.include(userList[name], 'login_url');
+        assert.include(userList[name], 'email');
+        assert.include(userList[name], 'password');
+      });
+    },
+
+    "and retrieving the userList ":  {
+    
+      topic: function () {
+        return faceTest.getFacebookUsers();
+      },
+
+      "it should contain all the created users": function(userList) {
+        testData.multipleUsers.forEach(function (name) {
+          assert.include(userList, name);
+          assert.include(userList[name], 'access_token');
+          assert.include(userList[name], 'login_url');
+          assert.include(userList[name], 'email');
+          assert.include(userList[name], 'password');
+        });
+      }
+    }
+  }
+}).addBatch({
+  'After multiple users creation': {
+    topic:  function () {
+      faceTest.removeAllFacebookUsers(this.callback); 
+    },
+
+    'test users should be deleted': function (err, res) {
+      assert.isNull(err);
+      assert.equal(res.data, "true");
+      assert.isEmpty(faceTest.getFacebookUsers());
     }
   }
 }).export(module);
