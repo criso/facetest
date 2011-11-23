@@ -1,9 +1,8 @@
-var fbgraph  = require('fbgraph')
-  , vows     = require('vows')
+var vows     = require('vows')
   , assert   = require('assert') 
   , FaceTest = require('../index');
 
-var faceTest       = new FaceTest();
+var faceTest = new FaceTest();
 
 // test Data
 var testData = {
@@ -15,23 +14,11 @@ var testData = {
 };
 
 
-// do we need to reset fbgraph?
 vows.describe("testUser.test").addBatch({
-  "Before starting a test suite": {
-    topic:  function () {
-      return fbgraph.setAccessToken(null);
-    },
-
-    "*access token* should be null": function (fbgraph) {
-      assert.isNull(fbgraph.getAccessToken());
-    }
-  }
-}).addBatch({
-
   'When creating a single user': {
 
     topic: function () {
-      return faceTest.createUser(testData.singleUser);
+      faceTest.createUser(testData.singleUser, this.callback);
     },
 
     "on success it should return the user": function(err, user) {
@@ -76,10 +63,11 @@ vows.describe("testUser.test").addBatch({
 }).addBatch({
   'When creating multiple users': {
     topic: function () {
-      return faceTest.createUsers(testData.multipleUsers);
+      faceTest.createUsers(testData.multipleUsers, this.callback);
     },
 
-    "on success it should return the list of users": function(userList) {
+    "on success it should return the list of users": function(err, userList) {
+      assert.isNull(err);
       testData.multipleUsers.forEach(function (name) {
         assert.include(userList, name);
         assert.include(userList[name], 'access_token');
@@ -121,10 +109,10 @@ vows.describe("testUser.test").addBatch({
 }).addBatch({
   'When creating users who are friends with each other': {
     topic: function () {
-      return faceTest.createFriends(testData.friends);
+      faceTest.createFriends(testData.friends, this.callback);
     },
 
-    "on success it should return a list of valid users": function(userList) {
+    "on success it should return a list of valid users": function(err, userList) {
       // testData
       var reqFrom      = Object.keys(testData.friends)[0]
         , reqToList    = testData.friends[reqFrom]
@@ -139,7 +127,7 @@ vows.describe("testUser.test").addBatch({
       });
     },
 
-    "req user obj should have an array of valid friend users": function (userList) {
+    "req user obj should have an array of valid friend users": function (err, userList) {
       // testData
       var reqFrom = Object.keys(testData.friends)[0]
         , reqUser = userList[reqFrom];
