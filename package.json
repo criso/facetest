@@ -6,7 +6,7 @@
   "homepage": "https://github.com/criso/facetest",
   "repository": {
     "type": "git",
-    "url": "git://github.com/criso/fbtest.git"
+    "url": "git://github.com/criso/facetest.git"
   },
   "main": "index.js",
   "engines": {
