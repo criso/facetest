@@ -1,0 +1,17 @@
+{
+  "author": "Cristiano Oliveira <ocean.cris@gmail.com> (http://twitter.com/cris_o)",
+  "name": "facetest",
+  "description": "lib to provide easier creation of facebook test users for unit testing",
+  "version": "0.1.0",
+  "homepage": "https://github.com/criso/facetest",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/criso/fbtest.git"
+  },
+  "main": "index.js",
+  "engines": {
+    "node": "~0.4.12"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

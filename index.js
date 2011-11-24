@@ -1,1 +1,1 @@
-module.exports = require('./lib/fbtest');
+module.exports = require('./lib/facetest');

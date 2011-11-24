@@ -1,8 +1,10 @@
+// dependencies
 var vows     = require('vows')
   , assert   = require('assert') 
-  , FaceTest = require('../index');
+  , FaceTest = require('../index')
+  , fbConfig = require('./config').facebook;
 
-var faceTest = new FaceTest();
+var facetest = new FaceTest(fbConfig);
 
 // test Data
 var testData = {
@@ -18,7 +20,7 @@ vows.describe("testUser.test").addBatch({
   'When creating a single user': {
 
     topic: function () {
-      faceTest.createUser(testData.singleUser, this.callback);
+      facetest.createUser(testData.singleUser, this.callback);
     },
 
     "on success it should return the user": function(err, user) {
@@ -35,7 +37,7 @@ vows.describe("testUser.test").addBatch({
     "and retrieving the userList ":  {
 
       topic: function () {
-        return faceTest.getFacebookUsers();
+        return facetest.getFacebookUsers();
       },
 
       "it should contain the created user": function(userList) {
@@ -51,19 +53,19 @@ vows.describe("testUser.test").addBatch({
 }).addBatch({
   'After single user creation': {
     topic:  function () {
-      faceTest.removeAllFacebookUsers(this.callback); 
+      facetest.removeAllFacebookUsers(this.callback); 
     },
 
     'test users should be deleted': function (err, res) {
       assert.isNull(err);
       assert.equal(res.data, "true");
-      assert.isEmpty(faceTest.getFacebookUsers());
+      assert.isEmpty(facetest.getFacebookUsers());
     }
   }
 }).addBatch({
   'When creating multiple users': {
     topic: function () {
-      faceTest.createUsers(testData.multipleUsers, this.callback);
+      facetest.createUsers(testData.multipleUsers, this.callback);
     },
 
     "on success it should return the list of users": function(err, userList) {
@@ -80,7 +82,7 @@ vows.describe("testUser.test").addBatch({
     "and retrieving the userList ":  {
 
       topic: function () {
-        return faceTest.getFacebookUsers();
+        return facetest.getFacebookUsers();
       },
 
       "it should contain all the created users": function(userList) {
@@ -97,19 +99,19 @@ vows.describe("testUser.test").addBatch({
 }).addBatch({
   'After multiple users creation': {
     topic:  function () {
-      faceTest.removeAllFacebookUsers(this.callback); 
+      facetest.removeAllFacebookUsers(this.callback); 
     },
 
     'test users should be deleted': function (err, res) {
       assert.isNull(err);
       assert.equal(res.data, "true");
-      assert.isEmpty(faceTest.getFacebookUsers());
+      assert.isEmpty(facetest.getFacebookUsers());
     }
   }
 }).addBatch({
   'When creating users who are friends with each other': {
     topic: function () {
-      faceTest.createFriends(testData.friends, this.callback);
+      facetest.createFriends(testData.friends, this.callback);
     },
 
     "on success it should return a list of valid users": function(err, userList) {
@@ -143,18 +145,34 @@ vows.describe("testUser.test").addBatch({
         });
       });
 
+    },
+
+    "main user should have right amount of friends": function (err, userList) {
+      var reqFrom = Object.keys(testData.friends)[0];
+      assert.equal(userList[reqFrom].friends.length, testData.friends[reqFrom].length);
+    },
+
+    "retrieving user by name should work should return a valid user": function (err, userList) {
+      var key  = Object.keys(testData.friends)[0]
+        , user = facetest.getFacebookUser(testData.friends[key][0]);
+
+      assert.include(user, 'access_token');
+      assert.include(user, 'login_url');
+      assert.include(user, 'email');
+      assert.include(user, 'password');
     }
+
   }
 }).addBatch({
   'After Friends Creation': {
     topic:  function () {
-      faceTest.removeAllFacebookUsers(this.callback); 
+      facetest.removeAllFacebookUsers(this.callback); 
     },
 
     'test users should be deleted': function (err, res) {
       assert.isNull(err);
       assert.equal(res.data, "true");
-      assert.isEmpty(faceTest.getFacebookUsers());
+      assert.isEmpty(facetest.getFacebookUsers());
     }
   }
 }).export(module);
