@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/criso/facetest.png)](http://travis-ci.org/criso/facetest)
 ##dd  What?!
 [FaceTest](http://criso.github.com/facetest/) - nodejs module to facilitate api tests that require facebook test users
 
