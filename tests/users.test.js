@@ -1,8 +1,9 @@
 // dependencies
-var vows     = require('vows')
-  , assert   = require('assert') 
-  , FaceTest = require('../index')
-  , fbConfig = require('./config').facebook;
+var vows     = require('vows');
+
+var assert   = require('assert');
+var FaceTest = require('../index');
+var fbConfig = require('./config').facebook;
 
 var facetest = new FaceTest(fbConfig);
 
@@ -19,7 +20,7 @@ var testData = {
 vows.describe("testUser.test").addBatch({
   'When creating a single user': {
 
-    topic: function () {
+    topic() {
       facetest.createUser(testData.singleUser, this.callback);
     },
 
@@ -36,7 +37,7 @@ vows.describe("testUser.test").addBatch({
 
     "and retrieving the userList ":  {
 
-      topic: function () {
+      topic() {
         return facetest.getFacebookUsers();
       },
 
@@ -52,7 +53,7 @@ vows.describe("testUser.test").addBatch({
   }
 }).addBatch({
   'After single user creation': {
-    topic:  function () {
+    topic() {
       facetest.removeAllFacebookUsers(this.callback); 
     },
 
@@ -64,13 +65,13 @@ vows.describe("testUser.test").addBatch({
   }
 }).addBatch({
   'When creating multiple users': {
-    topic: function () {
+    topic() {
       facetest.createUsers(testData.multipleUsers, this.callback);
     },
 
     "on success it should return the list of users": function(err, userList) {
       assert.isNull(err);
-      testData.multipleUsers.forEach(function (name) {
+      testData.multipleUsers.forEach(name => {
         assert.include(userList, name);
         assert.include(userList[name], 'access_token');
         assert.include(userList[name], 'login_url');
@@ -81,12 +82,12 @@ vows.describe("testUser.test").addBatch({
 
     "and retrieving the userList ":  {
 
-      topic: function () {
+      topic() {
         return facetest.getFacebookUsers();
       },
 
       "it should contain all the created users": function(userList) {
-        testData.multipleUsers.forEach(function (name) {
+        testData.multipleUsers.forEach(name => {
           assert.include(userList, name);
           assert.include(userList[name], 'access_token');
           assert.include(userList[name], 'login_url');
@@ -98,7 +99,7 @@ vows.describe("testUser.test").addBatch({
   }
 }).addBatch({
   'After multiple users creation': {
-    topic:  function () {
+    topic() {
       facetest.removeAllFacebookUsers(this.callback); 
     },
 
@@ -110,17 +111,18 @@ vows.describe("testUser.test").addBatch({
   }
 }).addBatch({
   'When creating users who are friends with each other': {
-    topic: function () {
+    topic() {
       facetest.createFriends(testData.friends, this.callback);
     },
 
     "on success it should return a list of valid users": function(err, userList) {
       // testData
-      var reqFrom      = Object.keys(testData.friends)[0]
-        , reqToList    = testData.friends[reqFrom]
-        , newUsersList = reqToList.concat(reqFrom);
+      var reqFrom      = Object.keys(testData.friends)[0];
 
-      newUsersList.forEach(function (name) {
+      var reqToList    = testData.friends[reqFrom];
+      var newUsersList = reqToList.concat(reqFrom);
+
+      newUsersList.forEach(name => {
         assert.include(userList, name);
         assert.include(userList[name], 'access_token');
         assert.include(userList[name], 'login_url');
@@ -131,20 +133,20 @@ vows.describe("testUser.test").addBatch({
 
     "req user obj should have an array of valid friend users": function (err, userList) {
       // testData
-      var reqFrom = Object.keys(testData.friends)[0]
-        , reqUser = userList[reqFrom];
+      var reqFrom = Object.keys(testData.friends)[0];
 
-      Object.keys(reqUser.friends).forEach(function (name) {
+      var reqUser = userList[reqFrom];
+
+      Object.keys(reqUser.friends).forEach(name => {
         assert.include(testData.friends.reqFrom, name);
 
-        reqUser.friends.forEach(function (friend) {
+        reqUser.friends.forEach(friend => {
           assert.include(userList[name], 'access_token');
           assert.include(userList[name], 'login_url');
           assert.include(userList[name], 'email');
           assert.include(userList[name], 'password');
         });
       });
-
     },
 
     "main user should have right amount of friends": function (err, userList) {
@@ -153,8 +155,8 @@ vows.describe("testUser.test").addBatch({
     },
 
     "retrieving user by name should work should return a valid user": function (err, userList) {
-      var key  = Object.keys(testData.friends)[0]
-        , user = facetest.getFacebookUser(testData.friends[key][0]);
+      var key  = Object.keys(testData.friends)[0];
+      var user = facetest.getFacebookUser(testData.friends[key][0]);
 
       assert.include(user, 'access_token');
       assert.include(user, 'login_url');
@@ -165,7 +167,7 @@ vows.describe("testUser.test").addBatch({
   }
 }).addBatch({
   'After Friends Creation': {
-    topic:  function () {
+    topic() {
       facetest.removeAllFacebookUsers(this.callback); 
     },
 
